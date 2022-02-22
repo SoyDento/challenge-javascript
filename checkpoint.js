@@ -34,6 +34,11 @@ const {
 
 function exponencial(exp) {
 
+    return function (base) {
+
+            return base ** exp;
+    }
+
 }
 
 // ----- Recursión -----
@@ -69,9 +74,44 @@ function exponencial(exp) {
 // haciendo los movimientos SUR->ESTE->NORTE
 // Aclaraciones: el segundo parametro que recibe la funcion ('direccion') puede ser pasado vacio (null)
 
-function direcciones(laberinto) {
+function direcciones(laberinto, direccion = "") {    
 
-}
+    if (typeof laberinto !== 'object') return direccion;
+
+    let puntero =  laberinto;
+    
+    let swap = true;
+
+    while (swap) {
+      
+      swap = false; 
+      
+      if ( typeof puntero.N === 'object' || puntero.N === 'destino' ) {
+                 direccion += 'N';
+                 puntero = puntero.N;
+                 swap = true;
+         };
+      if ( typeof puntero.S === 'object' || puntero.S === 'destino' ) {
+                 direccion += 'S';
+                 puntero = puntero.S;
+                 swap = true;
+         };
+      if ( typeof puntero.E === 'object' || puntero.E === 'destino'  ) {
+                 direccion += 'E';
+                 puntero = puntero.E;
+                 swap = true;
+         };
+      if ( typeof puntero.O === 'object' || puntero.O === 'destino' ) {
+                 direccion += 'O';
+                 puntero = puntero.O;
+                 swap = true;
+         }
+      
+    }
+
+    return direccion
+};
+
 
 
 // EJERCICIO 3
@@ -88,8 +128,36 @@ function direcciones(laberinto) {
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
 function deepEqualArrays(arr1, arr2) {
-
-}
+  
+  if (arr1.length !== arr2.length) return false;
+ 
+  let bool = [];
+  
+  let punt1 = arr1; let punt2 = arr2;
+  
+  if (Array.isArray(punt1)) {
+  let swap = true;
+  
+    while (swap) {    
+        swap = false;
+           for ( let j = 0; j < punt1.length; j++ ) 
+               for ( let i = 0; i < punt2.length; i++ ) {
+                 if (Array.isArray(punt1[j]) && Array.isArray(punt2[i])) {
+                   swap = true;
+               punt1 = punt1[j]; punt2 = punt2[i];
+               }               
+             }
+        }
+     for ( let i = 0; i < punt1.length; i++ ) {
+        bool.push(punt1[i] === punt2[i])
+            }
+    };
+   for ( let i = 0; i < arr1.length; i++ ) {
+        bool.push(arr1[i] === arr2[i])
+            }
+bool.pop();
+return !bool.includes(false)
+};
 
 
 
@@ -138,8 +206,32 @@ OrderedLinkedList.prototype.print = function(){
 // > LL.print()
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
-OrderedLinkedList.prototype.add = function(val){
-    
+OrderedLinkedList.prototype.add = function(value){
+
+    var newNodo = new Nodo(value);
+    // Si el head no apuntara a nada (lista vacia)
+    if (!this.head) {
+        this.head = newNodo; 
+        return newNodo    }          
+    // Si el head si apuntara a un nodo
+    // Creo un cursor con el que recorrer la lista
+    let cursor = this.head;
+    //AHora compara el valor de los 'cursor' con el valor entrante
+     // Mientras el cursor este apuntando a alguien
+    while (cursor.value > value && cursor.next) {
+        // Muevo el cursor al nodo apuntado
+        cursor = cursor.next;
+    }
+    // Ahora que el cursor no apunta a otro nodo (null)
+    // Hago que el nodo del cursor apunte al nuevo nodo
+    if (cursor.next === null) {
+        cursor.next = newNodo;
+        return newNodo};
+    // Pero si el while se corta antes tengo que insertar en newNodo en medio
+    newNodo.next = cursor; 
+    cursor.next = newNodo;
+    return newNodo
+     
 }
 
 
@@ -159,7 +251,12 @@ OrderedLinkedList.prototype.add = function(val){
 // < null
 
 OrderedLinkedList.prototype.removeHigher = function(){
-    
+
+    if (!this.head) return null;
+
+    let aux = this.head.value;
+    this.head = this.head.next;
+    return aux;
 }
 
 
@@ -180,6 +277,26 @@ OrderedLinkedList.prototype.removeHigher = function(){
 
 OrderedLinkedList.prototype.removeLower = function(){
     
+
+    if (!this.head) return null;
+    
+    if (!this.head.next) {
+        
+        let unicoNodo = this.head;       
+        this.head = null
+               return unicoNodo.value;
+    }
+    
+    let cursor = this.head;
+    
+    while (cursor.next.next) {        
+        cursor = cursor.next;
+    }
+    
+    let ultimoNodo = cursor.next;
+    cursor.next = null;
+    
+    return ultimoNodo.value;
 }
 
 
