@@ -34,10 +34,7 @@ const {
 
 function exponencial(exp) {
 
-    return function (base) {
-
-            return base ** exp;
-    }
+    return (base)=>  base ** exp;
 
 }
 
@@ -76,40 +73,23 @@ function exponencial(exp) {
 
 function direcciones(laberinto, direccion = "") {    
 
-    if (typeof laberinto !== 'object') return direccion;
+   if (!laberinto) return '';
 
-    let puntero =  laberinto;
-    
-    let swap = true;
+    for(let key in laberinto){
 
-    while (swap) {
-      
-      swap = false; 
-      
-      if ( typeof puntero.N === 'object' || puntero.N === 'destino' ) {
-                 direccion += 'N';
-                 puntero = puntero.N;
-                 swap = true;
-         };
-      if ( typeof puntero.S === 'object' || puntero.S === 'destino' ) {
-                 direccion += 'S';
-                 puntero = puntero.S;
-                 swap = true;
-         };
-      if ( typeof puntero.E === 'object' || puntero.E === 'destino'  ) {
-                 direccion += 'E';
-                 puntero = puntero.E;
-                 swap = true;
-         };
-      if ( typeof puntero.O === 'object' || puntero.O === 'destino' ) {
-                 direccion += 'O';
-                 puntero = puntero.O;
-                 swap = true;
-         }
-      
+        if(laberinto[key] !== 'pared'){
+
+            direccion += key;
+
+            if(laberinto[key] !== 'destino'){
+                return direcciones(laberinto[key],direccion);
+            }else{
+                return direccion;
+            }
+        }
     }
+    return '';
 
-    return direccion
 };
 
 
@@ -128,36 +108,21 @@ function direcciones(laberinto, direccion = "") {
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
 function deepEqualArrays(arr1, arr2) {
+
+   
+    if (arr1.length !== arr2.length) return false;
+
+    for (let i=0; i<arr1.length; i++){
+
+        if(arr1[i] !== arr2[i]) return false;
+
+        if(Array.isArray(arr1)) return deepEqualArrays (arr1[i], arr2[i])
+    }
+    return true;
+}
+
   
-  if (arr1.length !== arr2.length) return false;
  
-  let bool = [];
-  
-  let punt1 = arr1; let punt2 = arr2;
-  
-  if (Array.isArray(punt1)) {
-  let swap = true;
-  
-    while (swap) {    
-        swap = false;
-           for ( let j = 0; j < punt1.length; j++ ) 
-               for ( let i = 0; i < punt2.length; i++ ) {
-                 if (Array.isArray(punt1[j]) && Array.isArray(punt2[i])) {
-                   swap = true;
-               punt1 = punt1[j]; punt2 = punt2[i];
-               }               
-             }
-        }
-     for ( let i = 0; i < punt1.length; i++ ) {
-        bool.push(punt1[i] === punt2[i])
-            }
-    };
-   for ( let i = 0; i < arr1.length; i++ ) {
-        bool.push(arr1[i] === arr2[i])
-            }
-bool.pop();
-return !bool.includes(false)
-};
 
 
 
@@ -228,8 +193,8 @@ OrderedLinkedList.prototype.add = function(value){
         cursor.next = newNodo;
         return newNodo};
     // Pero si el while se corta antes tengo que insertar en newNodo en medio
-    newNodo.next = cursor; 
-    cursor.next = newNodo;
+    newNodo.next = cursor.next; 
+    this.next = newNodo;
     return newNodo
      
 }
@@ -328,8 +293,15 @@ OrderedLinkedList.prototype.removeLower = function(){
 // > multiCallbacks(cbs1, cbs2);
 // < ["2-1", "1-1", "1-2", "2-2"];
 
-function multiCallbacks(cbs1, cbs2){
+function multiCallbacks(cbs1, cbs2, arr = []) {
     
+    for ( let i = 0; i < cbs1.length; i++) {
+
+            ( cbs1[i].time < cbs2[i].time ) ?
+                    arr.push(cbs1[i].cb(), cbs2[i].cb())  :
+                    arr.push(cbs2[i].cb(), cbs1[i].cb())      
+    };
+    return arr
 }
 
 
@@ -347,9 +319,15 @@ function multiCallbacks(cbs1, cbs2){
 // 5   9
 // resultado:[5,8,9,32,64]
 
-BinarySearchTree.prototype.toArray = function() {
+BinarySearchTree.prototype.toArray = function(arr = []) {
+
+    let myFunction = (x)=> arr.push(x);
+
+    this.depthFirstForEach(myFunction, "in-order");
+
+    return arr;
     
-}
+};
 
 
 
@@ -366,7 +344,21 @@ BinarySearchTree.prototype.toArray = function() {
 // Si bien esta no es la mejor implementacion existente, con que uds puedan 
 // informarse sobre algoritmos, leerlos de un pseudocodigo e implemnterlos alcanzara
 
-function primalityTest(n) {
+function primalityTest(num) {
+
+  if (num <= 3) return num > 1;
+  
+  if ((num % 2 === 0) || (num % 3 === 0)) return false;
+  
+  let count = 5;
+  
+  while (Math.pow(count, 2) <= num) {
+    if (num % count === 0 || num % (count + 2) === 0) return false;
+    
+    count += 6;
+  }
+  
+  return true;
     
 }
 
@@ -377,6 +369,16 @@ function primalityTest(n) {
 // https://en.wikipedia.org/wiki/Quicksort
 
 function quickSort(array) {
+
+    if(array.length < 1)  return [];
+  let left = [];
+  let right = [];
+  let pivot = array[0];
+
+  for(let i=1; i<array.length; i++){
+    (array[i]< pivot) ? right.push(array[i]) : left.push(array[i])
+  }
+  return [].concat(quickSort(left), pivot, quickSort(right)) 
     
 }
 // QuickSort ya lo conocen solo que este 
@@ -399,8 +401,14 @@ function quickSort(array) {
 // > reverse(95823);
 // < 32859
 
-function reverse(num){
-    
+function reverse(num, invertido = 0){
+  
+  if ( num == 0 ) return  invertido;
+
+    invertido = invertido * 10 + (num % 10);
+    num = Math.floor(num / 10);
+
+  return reverse(num, invertido);
 }
 // la grandiosa resolucion de Wilson!!!
 // declaran una variable donde 
