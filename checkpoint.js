@@ -171,32 +171,32 @@ OrderedLinkedList.prototype.print = function(){
 // > LL.print()
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
-OrderedLinkedList.prototype.add = function(value){
+OrderedLinkedList.prototype.add = function(val){
 
-    var newNodo = new Nodo(value);
-    // Si el head no apuntara a nada (lista vacia)
-    if (!this.head) {
-        this.head = newNodo; 
-        return newNodo    }          
-    // Si el head si apuntara a un nodo
-    // Creo un cursor con el que recorrer la lista
-    let cursor = this.head;
-    //AHora compara el valor de los 'cursor' con el valor entrante
-     // Mientras el cursor este apuntando a alguien
-    while (cursor.value > value && cursor.next) {
-        // Muevo el cursor al nodo apuntado
-        cursor = cursor.next;
+if (!this.head) {
+        this.head = new Node(val);
+        return;
     }
-    // Ahora que el cursor no apunta a otro nodo (null)
-    // Hago que el nodo del cursor apunte al nuevo nodo
-    if (cursor.next === null) {
-        cursor.next = newNodo;
-        return newNodo};
-    // Pero si el while se corta antes tengo que insertar en newNodo en medio
-    newNodo.next = cursor.next; 
-    this.next = newNodo;
-    return newNodo
-     
+
+    var current = this.head;
+
+    if (val > this.head.value) {
+        this.head = new Node(val);
+        this.head.next = current;
+        return;
+    }
+
+    while (current.next) {
+        if (val > current.next.value) {
+            var aux = current.next;
+            current.next = new Node(val);
+            current.next.next = aux;
+            return;
+        }
+        current.next = current.next.next;
+    }
+    current.next = new Node(val);
+ 
 }
 
 
@@ -220,7 +220,9 @@ OrderedLinkedList.prototype.removeHigher = function(){
     if (!this.head) return null;
 
     let aux = this.head.value;
-    this.head = this.head.next;
+
+   (!this.head.next) ? this.head = null : this.head = this.head.next;
+
     return aux;
 }
 
@@ -247,9 +249,9 @@ OrderedLinkedList.prototype.removeLower = function(){
     
     if (!this.head.next) {
         
-        let unicoNodo = this.head;       
-        this.head = null
-               return unicoNodo.value;
+        let aux = this.head.value;       
+        this.head = null;
+        return aux;
     }
     
     let cursor = this.head;
@@ -258,10 +260,10 @@ OrderedLinkedList.prototype.removeLower = function(){
         cursor = cursor.next;
     }
     
-    let ultimoNodo = cursor.next;
+    let aux2 = cursor.next.value;
     cursor.next = null;
     
-    return ultimoNodo.value;
+    return aux2;
 }
 
 
@@ -319,7 +321,9 @@ function multiCallbacks(cbs1, cbs2, arr = []) {
 // 5   9
 // resultado:[5,8,9,32,64]
 
-BinarySearchTree.prototype.toArray = function(arr = []) {
+BinarySearchTree.prototype.toArray = function() {
+
+    let arr = [];
 
     let myFunction = (x)=> arr.push(x);
 
@@ -344,21 +348,20 @@ BinarySearchTree.prototype.toArray = function(arr = []) {
 // Si bien esta no es la mejor implementacion existente, con que uds puedan 
 // informarse sobre algoritmos, leerlos de un pseudocodigo e implemnterlos alcanzara
 
-function primalityTest(num) {
+function primalityTest(n) {
 
-  if (num <= 3) return num > 1;
-  
-  if ((num % 2 === 0) || (num % 3 === 0)) return false;
-  
-  let count = 5;
-  
-  while (Math.pow(count, 2) <= num) {
-    if (num % count === 0 || num % (count + 2) === 0) return false;
-    
-    count += 6;
-  }
-  
-  return true;
+    let primo = true;
+    if (n < 2) {
+        primo = false;
+    } else {
+        for (let x = 2; x * x <= n; x++) {
+            if (n % x == 0) {
+                primo = false;
+                break;
+            }
+        }
+    }
+    return primo;
     
 }
 
@@ -370,13 +373,16 @@ function primalityTest(num) {
 
 function quickSort(array) {
 
-    if(array.length < 1)  return [];
+  if(array.length < 1)  return [];
+
   let left = [];
   let right = [];
   let pivot = array[0];
 
   for(let i=1; i<array.length; i++){
+
     (array[i]< pivot) ? right.push(array[i]) : left.push(array[i])
+
   }
   return [].concat(quickSort(left), pivot, quickSort(right)) 
     
@@ -402,13 +408,19 @@ function quickSort(array) {
 // < 32859
 
 function reverse(num, invertido = 0){
-  
-  if ( num == 0 ) return  invertido;
+/*  do {
+        invertido = invertido * 10 + (num % 10);
+        num = Math.floor(num / 10);
+    } while (num > 0);
+    return invertido;
+ */
+    if ( num == 0 ) return  invertido;
 
     invertido = invertido * 10 + (num % 10);
     num = Math.floor(num / 10);
 
   return reverse(num, invertido);
+ 
 }
 // la grandiosa resolucion de Wilson!!!
 // declaran una variable donde 
